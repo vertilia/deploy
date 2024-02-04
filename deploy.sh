@@ -13,31 +13,23 @@ mode:               main command to execute. Select from the following list:
                     SCRIPT_AFTER_BUILD and SCRIPT_AFTER_DIFF env variables; set
                     owner on release folder (specified in OWNER env variable,
                     default: www-data)
-  diff <link>       show side-by-side diff of current prod with the most recent
-                    release
-  diff-list <link>  show a list of files that differ between the current prod
-                    and the most recent release
+  diff <link>       show side-by-side diff of current release with the most
+                    recent release
+  diff-list <link>  show a list of files that differ between the current
+                    release and the most recent release
   drop-last <link>  delete folder with the most recent release (if not current)
   switch <link>     switch current link to the most recent release
   rollback <link>   switch current link to the previous release
-  clean <link> [<N>]  remove all but the last N release folders (default: 5)
+  clean <link> [<N>]  remove all but the N most recent release folders
+                    (default: 5)
   current <link>    show current link target
-  list              show a list of available doc roots in base folder (default:
-                    /var/www)
+  list              show a list of available doc roots in base folder
+                    (specified in BASE_WWW env variable, default: /var/www)
   self-update       pull the new version of deploy script from git
 
-link:               symbolic link name in /var/www pointing to current docroot
-                    of a subsystem ("cabinet", "tips", etc.), apache web root
-
-git_folder:         path to folder in a git project to use as a base for the
-                    release
-
-build_file:         .zip filename with a frontend build for "build" mode
-
-build_subfolder:    subfolder in build_file to merge (defaults to ".")
-
-owner:              unix name of the owner for the release folder (default:
-                    www-data)
+link:               symbolic link name in base www folder (specified in
+                    BASE_WWW env variable, default: /var/www), pointing to the
+                    current release docroot ("site.net", "example.com", etc.)
 
 EOT
 }
