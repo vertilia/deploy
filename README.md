@@ -64,6 +64,34 @@ May delete old releases keeping a number of the most recent releases.
    sudo deploy build example.com /opt/example-com/www ~/front-example-com.zip:build
    ```
 
+- build release in non-default web folder:
+
+   ```shell
+   BASE_WWW=/usr/local/nginx sudo deploy build example.com
+   ```
+
+- change release folder owner to non-default value after build:
+
+   ```shell
+   OWNER=john sudo deploy build example.com
+   ```
+
+- run an after build script passing current and new release folders as arguments; an after-build script is executed
+  after build but before diff phase (that identifies whether the new release contains updated files over the current
+  release):
+
+   ```shell
+   SCRIPT_AFTER_BUILD=./after-build.sh sudo deploy build example.com
+   ```
+
+- run an after diff script passing current and new release folders as arguments; an after-diff script is executed
+  after the diff phase (that identifies whether the new release contains updated files over the current release) and
+  only if the diff is non-empty:
+
+   ```shell
+   SCRIPT_AFTER_DIFF=./after-diff.sh sudo deploy build example.com
+   ```
+
 - verify differences between current release and the new one for `example.com` symlink (without moving the current
   symlink):
 
