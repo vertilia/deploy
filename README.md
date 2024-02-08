@@ -43,7 +43,7 @@ May delete old releases keeping a number of the most recent releases.
 
    ```shell
    cd /opt
-   sudo git clone git@github.com:vertilia/deploy.git
+   sudo git clone https://github.com/vertilia/deploy.git
    sudo ln -s /opt/deploy/deploy.sh /usr/local/bin/deploy
    ```
 
