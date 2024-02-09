@@ -33,7 +33,9 @@ folder, merging with the existing code from the git project.
 Script will check diff of the current release and the next release to verify correctness. If the new release has no diff
 with the current one, it will be deleted.
 
-Allows navigation to switch to the next release or rollback to the previous one.
+Allows to run user-defined scripts at different build phases.
+
+Provides commands to switch to the next release or rollback to the previous one.
 
 May delete old releases keeping a number of the most recent releases.
 
@@ -49,6 +51,18 @@ May delete old releases keeping a number of the most recent releases.
 
 ## Examples
 
+Given you have 2 web sites described above which are also stored as git projects (`example-com` and `site-net`), cloned
+in `/opt` folder, together with this `deploy` project.
+
+Your sources are organized as follows:
+
+```
+/opt:
+  deploy/
+  example-com/
+  site-net/
+```
+
 - build a new release from a git project `site-net` already cloned in `/opt` dir (creates a new
   folder `/var/www/site.net-TIMESTAMP` without moving the current symlink):
 
@@ -56,9 +70,9 @@ May delete old releases keeping a number of the most recent releases.
    sudo deploy build site.net /opt/site-net
    ```
 
-- build a new release from a git project `example-com` (folder `www/`) already cloned in `/opt` dir, merging additional
-  frontend stored in local `front-example-com.zip` file with `build/` folder inside the archive (creates a new
-  folder `/var/www/example.com-TIMESTAMP` without moving the current symlink):
+- build a new release from a git project `example-com` (it's `www/` subfolder) already cloned in `/opt` dir, merging
+  additional frontend stored in local `front-example-com.zip` file with `build/` folder inside the archive (creates
+  a new folder `/var/www/example.com-TIMESTAMP` without moving the current symlink):
 
    ```shell
    sudo deploy build example.com /opt/example-com/www ~/front-example-com.zip:build
@@ -67,13 +81,13 @@ May delete old releases keeping a number of the most recent releases.
 - build release in non-default web folder:
 
    ```shell
-   BASE_WWW=/usr/local/nginx sudo deploy build example.com
+   BASE_WWW=/usr/local/nginx sudo -E deploy build example.com
    ```
 
 - change release folder owner to non-default value after build:
 
    ```shell
-   OWNER=john sudo deploy build example.com
+   OWNER=john sudo -E deploy build example.com
    ```
 
 - run an after build script passing current and new release folders as arguments; an after-build script is executed
@@ -81,7 +95,7 @@ May delete old releases keeping a number of the most recent releases.
   release):
 
    ```shell
-   SCRIPT_AFTER_BUILD=./after-build.sh sudo deploy build example.com
+   SCRIPT_AFTER_BUILD=./after-build.sh sudo -E deploy build example.com
    ```
 
 - run an after diff script passing current and new release folders as arguments; an after-diff script is executed
@@ -89,7 +103,7 @@ May delete old releases keeping a number of the most recent releases.
   only if the diff is non-empty:
 
    ```shell
-   SCRIPT_AFTER_DIFF=./after-diff.sh sudo deploy build example.com
+   SCRIPT_AFTER_DIFF=./after-diff.sh sudo -E deploy build example.com
    ```
 
 - verify differences between current release and the new one for `example.com` symlink (without moving the current
