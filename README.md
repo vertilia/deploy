@@ -51,8 +51,8 @@ May delete old releases keeping a number of the most recent releases.
 
 ## Examples
 
-Given you have 2 web sites described above which are also stored as git projects (`example-com` and `site-net`), cloned
-in `/opt` folder, together with this `deploy` project.
+Given you have 2 web sites described in [Description]() which are also stored as git projects (`example-com` and
+`site-net`), cloned in `/opt` folder, together with this `deploy` project.
 
 Your sources are organized as follows:
 
@@ -60,6 +60,7 @@ Your sources are organized as follows:
 /opt:
   deploy/
   example-com/
+  example-com-darktheme.zip
   site-net/
 ```
 
@@ -70,12 +71,12 @@ Your sources are organized as follows:
    sudo deploy build site.net /opt/site-net
    ```
 
-- build a new release from a git project `example-com` (it's `www/` subfolder) already cloned in `/opt` dir, merging
-  additional frontend stored in local `front-example-com.zip` file with `build/` folder inside the archive (creates
+- build a new release from a git project `example-com` (it's `www/` subfolder) already cloned in `/opt` dir, copying
+  additional dark theme of zip archive `/opt/example-com-darktheme.zip` stored in `build/` folder inside it (creates
   a new folder `/var/www/example.com-TIMESTAMP` without moving the current symlink):
 
    ```shell
-   sudo deploy build example.com /opt/example-com/www ~/front-example-com.zip:build
+   sudo deploy build example.com /opt/example-com/www /opt/example-com-darktheme.zip:build
    ```
 
 - build release in non-default web folder:
