@@ -51,8 +51,9 @@ May delete old releases keeping a number of the most recent releases.
 
 ## Examples
 
-Given you have 2 web sites described in [Description]() which are also stored as git projects (`example-com` and
-`site-net`), cloned in `/opt` folder, together with this `deploy` project.
+Given you have 2 web sites described in [Description](#description) which are also stored as git projects
+(`example-com` and `site-net`), cloned in `/opt` folder, together with a dark theme for example.com site as an
+archive, and this `deploy` project.
 
 Your sources are organized as follows:
 
@@ -130,7 +131,7 @@ Your sources are organized as follows:
 
 ### Sample workflow with explanation of `switch` and `rollback` modes
 
-Starting with the file structure given in [Description](), with `example.com` symlink pointing
+Starting with the file structure given in [Description](#description), with `example.com` symlink pointing
 to `example.com-231012-151633` folder.
 
 - first `sudo deploy rollback example.com` command will change symlink to point to `example.com-231012-150241` (previous
