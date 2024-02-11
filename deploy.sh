@@ -18,7 +18,7 @@ mode:               main command to execute. Select from the following list:
   diff-list <link>  show a list of files that differ between the current
                     release and the most recent release
   drop-last <link>  delete folder with the most recent release (if not current)
-  switch <link>     switch current link to the most recent release
+  commit <link>     switch current link to the most recent release
   rollback <link>   switch current link to the previous release
   clean <link> [<N>]  remove all but the N most recent release folders
                     (default: 5)
@@ -179,7 +179,7 @@ case "$MODE" in
     rm -rf "$BASE_WWW/$NEXT_NAME"
     ;;
 
-  (switch)
+  (commit)
     CURR_NAME=$(readlink "$BASE_WWW/$LINK")
     NEXT_NAME=$(basename "$(ls -1d "$BASE_WWW/$LINK-"* |tail -1)")
 
