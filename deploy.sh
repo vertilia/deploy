@@ -104,6 +104,10 @@ case "$MODE" in
       rm -rf "/tmp/$NEXT_NAME"
     done
 
+    # set release folder owner
+    echo setting "$OWNER" as release owner...
+    chown -R "$OWNER":www-data "$BUILD_FOLDER"
+
     # execute SCRIPT_AFTER_BUILD if provided
     if [ -x "${SCRIPT_AFTER_BUILD}" ]
     then
@@ -112,10 +116,6 @@ case "$MODE" in
         exit 1
       }
     fi
-
-    # set release folder owner
-    echo setting "$OWNER" as release owner...
-    chown -R "$OWNER":www-data "$BUILD_FOLDER"
 
     # check difference with current release
     echo checking build difference with current folder...
