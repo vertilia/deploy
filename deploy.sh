@@ -138,7 +138,7 @@ case "$MODE" in
 
   (diff)
     CURR_NAME=$(readlink "$BASE_WWW/$LINK")
-    NEXT_NAME=$(basename "$(ls -1d "$BASE_WWW/$LINK-"* |tail -1)")
+    NEXT_NAME=$(basename "$(ls -1d "$BASE_WWW/$LINK-"[0-9]* |tail -1)")
     BUILD_FOLDER=$BASE_WWW/$NEXT_NAME
 
     [ "$CURR_NAME" = "$NEXT_NAME" ] && {
@@ -153,7 +153,7 @@ case "$MODE" in
 
   (diff-list)
     CURR_NAME=$(readlink "$BASE_WWW/$LINK")
-    NEXT_NAME=$(basename "$(ls -1d "$BASE_WWW/$LINK-"* |tail -1)")
+    NEXT_NAME=$(basename "$(ls -1d "$BASE_WWW/$LINK-"[0-9]* |tail -1)")
     BUILD_FOLDER=$BASE_WWW/$NEXT_NAME
 
     [ "$CURR_NAME" = "$NEXT_NAME" ] && {
@@ -168,7 +168,7 @@ case "$MODE" in
 
   (drop-last)
     CURR_NAME=$(readlink "$BASE_WWW/$LINK")
-    NEXT_NAME=$(basename "$(ls -1d "$BASE_WWW/$LINK-"* |tail -1)")
+    NEXT_NAME=$(basename "$(ls -1d "$BASE_WWW/$LINK-"[0-9]* |tail -1)")
 
     [ "$CURR_NAME" = "$NEXT_NAME" ] && {
       echo "Current link $LINK points to the most recent deploy, rollback first" >/dev/stderr
@@ -181,7 +181,7 @@ case "$MODE" in
 
   (commit)
     CURR_NAME=$(readlink "$BASE_WWW/$LINK")
-    NEXT_NAME=$(basename "$(ls -1d "$BASE_WWW/$LINK-"* |tail -1)")
+    NEXT_NAME=$(basename "$(ls -1d "$BASE_WWW/$LINK-"[0-9]* |tail -1)")
 
     [ "$CURR_NAME" = "$NEXT_NAME" ] && {
       echo "Current link $LINK already points to the most recent deploy" >/dev/stderr
@@ -196,7 +196,7 @@ case "$MODE" in
 
   (rollback)
     CURR_NAME=$(readlink "$BASE_WWW/$LINK")
-    PREV_NAME=$(cd "$BASE_WWW"; ls -1d "$LINK-"* |awk -v "CURR=$CURR_NAME" '$0==CURR {exit} {prev=$0} END {print prev}')
+    PREV_NAME=$(cd "$BASE_WWW"; ls -1d "$LINK-"[0-9]* |awk -v "CURR=$CURR_NAME" '$0==CURR {exit} {prev=$0} END {print prev}')
 
     [ -z "$PREV_NAME" ] && {
       echo "Cannot rollback: '$CURR_NAME' is the earliest available deploy" >/dev/stderr
@@ -215,7 +215,7 @@ case "$MODE" in
   (clean)
     N_KEEP=${3:-5}
     echo remove all but the last $N_KEEP $LINK releases...
-    ls -1d "$BASE_WWW/$LINK-"* |head -n -"$N_KEEP" |xargs sudo rm -rf
+    ls -1d "$BASE_WWW/$LINK-"[0-9]* |head -n -"$N_KEEP" |xargs sudo rm -rf
     ;;
 
   (current)
