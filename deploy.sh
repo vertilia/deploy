@@ -46,13 +46,13 @@ case "$MODE" in
   (*)
     [ -n "$LINK" ] || {
       show_usage
-      echo "Missing link argument" >/dev/stderr
+      echo "Missing link argument" >>/dev/stderr
       exit 1
     }
 
     [ -L "$BASE_WWW/$LINK" ] || {
       show_usage
-      echo "Provided link '$LINK' is not a symlink in $BASE_WWW" >/dev/stderr
+      echo "Provided link '$LINK' is not a symlink in $BASE_WWW" >>/dev/stderr
       exit 1
     }
     ;;
@@ -64,7 +64,7 @@ case "$MODE" in
     GIT_FOLDER="$3"
 
     [ -d "$GIT_FOLDER" ] || {
-      echo "Git folder '$GIT_FOLDER' does not exist" >/dev/stderr
+      echo "Git folder '$GIT_FOLDER' does not exist" >>/dev/stderr
       exit 1
     }
 
@@ -88,14 +88,14 @@ case "$MODE" in
       shift
 
       [ ! -r "$BUILD_FILE" ] && {
-        echo "Build file '$BUILD_FILE' does not exist" >/dev/stderr
+        echo "Build file '$BUILD_FILE' does not exist" >>/dev/stderr
         continue
       }
 
       echo merge contents from $BUILD_FILE:/$BUILD_SUBFOLDER into release folder $BUILD_FOLDER...
       unzip -q "$BUILD_FILE" -d "/tmp/$NEXT_NAME"
       [ -d "/tmp/$NEXT_NAME/$BUILD_SUBFOLDER" ] || {
-        echo "Correct build subfolder is required, '$BUILD_SUBFOLDER' does not exist in '$BUILD_FILE'" >/dev/stderr
+        echo "Correct build subfolder is required, '$BUILD_SUBFOLDER' does not exist in '$BUILD_FILE'" >>/dev/stderr
         rm -rf "/tmp/$NEXT_NAME"
         rm -rf "$1"
         continue
@@ -112,7 +112,7 @@ case "$MODE" in
     if [ -x "${SCRIPT_AFTER_BUILD}" ]
     then
       "$SCRIPT_AFTER_BUILD" "$BUILD_FOLDER" "$BASE_WWW/$LINK" || {
-        echo "Error running SCRIPT_AFTER_BUILD from $SCRIPT_AFTER_BUILD" >/dev/stderr
+        echo "Error running SCRIPT_AFTER_BUILD from $SCRIPT_AFTER_BUILD" >>/dev/stderr
         exit 1
       }
     fi
@@ -120,7 +120,7 @@ case "$MODE" in
     # check difference with current release
     echo checking build difference with current folder...
     diff -r --ignore-all-space --strip-trailing-cr --no-dereference "$BASE_WWW/$LINK/" "$BUILD_FOLDER/" >/dev/null && {
-      echo "New build is the same as current one, removing" >/dev/stderr
+      echo "New build is the same as current one, removing" >>/dev/stderr
       rm -rf "$BUILD_FOLDER"
       exit 1
     }
@@ -129,7 +129,7 @@ case "$MODE" in
     if [ -x "${SCRIPT_AFTER_DIFF}" ]
     then
       "$SCRIPT_AFTER_DIFF" "$BUILD_FOLDER" "$BASE_WWW/$LINK" || {
-        echo "Error running SCRIPT_AFTER_DIFF from $SCRIPT_AFTER_DIFF" >/dev/stderr
+        echo "Error running SCRIPT_AFTER_DIFF from $SCRIPT_AFTER_DIFF" >>/dev/stderr
         exit 1
       }
     fi
@@ -142,7 +142,7 @@ case "$MODE" in
     BUILD_FOLDER=$BASE_WWW/$NEXT_NAME
 
     [ "$CURR_NAME" = "$NEXT_NAME" ] && {
-      echo "Current link $LINK already points to the most recent deploy" >/dev/stderr
+      echo "Current link $LINK already points to the most recent deploy" >>/dev/stderr
       exit 1
     }
 
@@ -157,7 +157,7 @@ case "$MODE" in
     BUILD_FOLDER=$BASE_WWW/$NEXT_NAME
 
     [ "$CURR_NAME" = "$NEXT_NAME" ] && {
-      echo "Current link $LINK already points to the most recent deploy" >/dev/stderr
+      echo "Current link $LINK already points to the most recent deploy" >>/dev/stderr
       exit 1
     }
 
@@ -171,7 +171,7 @@ case "$MODE" in
     NEXT_NAME=$(basename "$(ls -1d "$BASE_WWW/$LINK-"[0-9]* |tail -1)")
 
     [ "$CURR_NAME" = "$NEXT_NAME" ] && {
-      echo "Current link $LINK points to the most recent deploy, rollback first" >/dev/stderr
+      echo "Current link $LINK points to the most recent deploy, rollback first" >>/dev/stderr
       exit 1
     }
 
@@ -184,7 +184,7 @@ case "$MODE" in
     NEXT_NAME=$(basename "$(ls -1d "$BASE_WWW/$LINK-"[0-9]* |tail -1)")
 
     [ "$CURR_NAME" = "$NEXT_NAME" ] && {
-      echo "Current link $LINK already points to the most recent deploy" >/dev/stderr
+      echo "Current link $LINK already points to the most recent deploy" >>/dev/stderr
       exit 1
     }
 
@@ -199,13 +199,13 @@ case "$MODE" in
     PREV_NAME=$(cd "$BASE_WWW"; ls -1d "$LINK-"[0-9]* |awk -v "CURR=$CURR_NAME" '$0==CURR {exit} {prev=$0} END {print prev}')
 
     [ -z "$PREV_NAME" ] && {
-      echo "Cannot rollback: '$CURR_NAME' is the earliest available deploy" >/dev/stderr
+      echo "Cannot rollback: '$CURR_NAME' is the earliest available deploy" >>/dev/stderr
       exit 1
     }
 
     echo rollback current link from $BASE_WWW/$CURR_NAME to $BASE_WWW/$PREV_NAME...
     cd "$BASE_WWW" || {
-      echo "Cannot cd to: '$BASE_WWW'" >/dev/stderr
+      echo "Cannot cd to: '$BASE_WWW'" >>/dev/stderr
       exit 1
     }
     rm "$LINK"
@@ -234,7 +234,7 @@ case "$MODE" in
 
   (*)
     show_usage
-    echo "Unknown operating mode" >/dev/stderr
+    echo "Unknown operating mode" >>/dev/stderr
     exit 1
     ;;
 esac
