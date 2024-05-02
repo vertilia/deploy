@@ -77,7 +77,7 @@ case "$MODE" in
     git -C "$GIT_FOLDER" pull
 
     # create build folder from updated sources
-    echo copy "$GIT_FOLDER" to build folder "$BUILD_FOLDER"...
+    echo copy "$GIT_FOLDER" to the build folder "$BUILD_FOLDER"...
     mkdir "$BUILD_FOLDER"
     rsync -aC "$GIT_FOLDER/" "$BUILD_FOLDER/"
 
@@ -142,7 +142,7 @@ case "$MODE" in
     BUILD_FOLDER=$BASE_WWW/$NEXT_NAME
 
     [ "$CURR_NAME" = "$NEXT_NAME" ] && {
-      echo "Current link $LINK already points to the most recent deploy" >>/dev/stderr
+      echo "Current link $LINK already points to the most recent build" >>/dev/stderr
       exit 1
     }
 
@@ -157,7 +157,7 @@ case "$MODE" in
     BUILD_FOLDER=$BASE_WWW/$NEXT_NAME
 
     [ "$CURR_NAME" = "$NEXT_NAME" ] && {
-      echo "Current link $LINK already points to the most recent deploy" >>/dev/stderr
+      echo "Current link $LINK already points to the most recent build" >>/dev/stderr
       exit 1
     }
 
@@ -171,7 +171,7 @@ case "$MODE" in
     NEXT_NAME=$(basename "$(ls -1d "$BASE_WWW/$LINK-"[0-9]* |tail -1)")
 
     [ "$CURR_NAME" = "$NEXT_NAME" ] && {
-      echo "Current link $LINK points to the most recent deploy, rollback first" >>/dev/stderr
+      echo "Current link $LINK points to the most recent build, rollback first" >>/dev/stderr
       exit 1
     }
 
@@ -184,7 +184,7 @@ case "$MODE" in
     NEXT_NAME=$(basename "$(ls -1d "$BASE_WWW/$LINK-"[0-9]* |tail -1)")
 
     [ "$CURR_NAME" = "$NEXT_NAME" ] && {
-      echo "Current link $LINK already points to the most recent deploy" >>/dev/stderr
+      echo "Current link $LINK already points to the most recent build" >>/dev/stderr
       exit 1
     }
 
@@ -199,7 +199,7 @@ case "$MODE" in
     PREV_NAME=$(cd "$BASE_WWW"; ls -1d "$LINK-"[0-9]* |awk -v "CURR=$CURR_NAME" '$0==CURR {exit} {prev=$0} END {print prev}')
 
     [ -z "$PREV_NAME" ] && {
-      echo "Cannot rollback: '$CURR_NAME' is the earliest available deploy" >>/dev/stderr
+      echo "Cannot rollback: '$CURR_NAME' is the earliest available build" >>/dev/stderr
       exit 1
     }
 
