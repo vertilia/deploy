@@ -7,20 +7,20 @@ Usage: $0 <mode> [<link>] [...args]
 mode:               main command to execute. Select from the following list:
 
   build <link> <git_dir> [zip_file[:subdir]] ...
-                    build a new release from a subfolder of a git project,
+                    construct a new build from a subfolder of a git project,
                     optionally add contents of one or more zip archives (or
                     their subdirectories) and execute scripts if provided in
                     SCRIPT_AFTER_BUILD and SCRIPT_AFTER_DIFF env variables; set
-                    owner on release folder (specified in OWNER env variable,
+                    owner on build folder (specified in OWNER env variable,
                     default: www-data)
-  diff <link>       show side-by-side diff of current release with the most
-                    recent release
+  diff <link>       show side-by-side diff of current build with the most
+                    recent build
   diff-list <link>  show a list of files that differ between the current
-                    release and the most recent release
-  drop-last <link>  delete folder with the most recent release (if not current)
-  commit <link>     switch current link to the most recent release
-  rollback <link>   switch current link to the previous release
-  clean <link> [<N>]  remove all but the N most recent release folders
+                    build and the most recent build
+  drop-last <link>  delete folder with the most recent build (if not current)
+  release <link>    switch current link to the most recent build
+  rollback <link>   switch current link to the previous build
+  clean <link> [<N>]  remove all but the N most recent build folders
                     (default: 5)
   current <link>    show current link target
   list              show a list of available doc roots in base folder
@@ -29,7 +29,7 @@ mode:               main command to execute. Select from the following list:
 
 link:               symbolic link name in base www folder (specified in
                     BASE_WWW env variable, default: /var/www), pointing to the
-                    current release docroot ("site.net", "example.com", etc.)
+                    current build docroot ("site.net", "example.com", etc.)
 
 EOT
 }
@@ -76,7 +76,7 @@ case "$MODE" in
     echo pull "$GIT_FOLDER" sources...
     git -C "$GIT_FOLDER" pull
 
-    # create release folder from updated sources
+    # create build folder from updated sources
     echo copy "$GIT_FOLDER" to build folder "$BUILD_FOLDER"...
     mkdir "$BUILD_FOLDER"
     rsync -aC "$GIT_FOLDER/" "$BUILD_FOLDER/"
@@ -92,7 +92,7 @@ case "$MODE" in
         continue
       }
 
-      echo merge contents from $BUILD_FILE:/$BUILD_SUBFOLDER into release folder $BUILD_FOLDER...
+      echo merge contents from $BUILD_FILE:/$BUILD_SUBFOLDER into build folder $BUILD_FOLDER...
       unzip -q "$BUILD_FILE" -d "/tmp/$NEXT_NAME"
       [ -d "/tmp/$NEXT_NAME/$BUILD_SUBFOLDER" ] || {
         echo "Correct build subfolder is required, '$BUILD_SUBFOLDER' does not exist in '$BUILD_FILE'" >>/dev/stderr
@@ -104,8 +104,8 @@ case "$MODE" in
       rm -rf "/tmp/$NEXT_NAME"
     done
 
-    # set release folder owner
-    echo setting "$OWNER" as release owner...
+    # set build folder owner
+    echo setting "$OWNER" as build owner...
     chown -R "$OWNER":www-data "$BUILD_FOLDER"
 
     # execute SCRIPT_AFTER_BUILD if provided
@@ -117,7 +117,7 @@ case "$MODE" in
       }
     fi
 
-    # check difference with current release
+    # check difference with current build
     echo checking build difference with current folder...
     diff -r --ignore-all-space --strip-trailing-cr --no-dereference "$BASE_WWW/$LINK/" "$BUILD_FOLDER/" >/dev/null && {
       echo "New build is the same as current one, removing" >>/dev/stderr
@@ -179,7 +179,7 @@ case "$MODE" in
     rm -rf "$BASE_WWW/$NEXT_NAME"
     ;;
 
-  (commit)
+  (release|commit)
     CURR_NAME=$(readlink "$BASE_WWW/$LINK")
     NEXT_NAME=$(basename "$(ls -1d "$BASE_WWW/$LINK-"[0-9]* |tail -1)")
 
@@ -214,7 +214,7 @@ case "$MODE" in
 
   (clean)
     N_KEEP=${3:-5}
-    echo remove all but the last $N_KEEP $LINK releases...
+    echo remove all but the last $N_KEEP $LINK builds...
     ls -1d "$BASE_WWW/$LINK-"[0-9]* |head -n -"$N_KEEP" |xargs sudo rm -rf
     ;;
 
