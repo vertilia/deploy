@@ -6,7 +6,7 @@ Deploy script to release builds from git repositories into web folders
 
 Script for releasing from git repositories with the possibility to merge additional code from provided archive files.
 
-### Organizes releases in `/var/www` folder in the following manner:
+### Organizes builds in `/var/www` folder in the following manner:
 
 ```
 /var/www:
@@ -21,7 +21,7 @@ Script for releasing from git repositories with the possibility to merge additio
 ```
 
 Here, `site.net` and `example.com` are configured as doc roots for corresponding sites in Apache. These are symlinks
-pointing to timestamped folders with real releases.
+pointing to timestamped folders with real builds.
 
 ### Corresponding sources are cloned as git working directories
 
@@ -44,26 +44,26 @@ pointing to timestamped folders with real releases.
 
 Here, you have sources for both your sites inside the corresponding git projects. 
 
-New release for `site.net` project will be created in a folder `/var/www/site.net-TIMESTAMP`, it's contents will be
-first pulled by a git project in `/opt/site-net` folder and then copied into the release folder.
+New build for `site.net` project will be created in a folder `/var/www/site.net-TIMESTAMP`, it's contents will be
+first pulled by a git project in `/opt/site-net` folder and then copied into the build folder.
 
-When creating a new release for `example.com` site, the script should pull the last version of `/opt/example-com`, copy
-the contents of its `www/` sub-folder to the new release folder, then unzip the `/opt/example-com-darktheme.zip` file to
-temporary directory and copy the contents of its `build/` subdirectory to the release folder.
+When creating a new build for `example.com` site, the script should pull the last version of `/opt/example-com`, copy
+the contents of its `www/` sub-folder to the new build folder, then unzip the `/opt/example-com-darktheme.zip` file to
+temporary directory and copy the contents of its `build/` subdirectory to the build folder.
 
-The script will check the diff of the current release and the just produced candidate release. If both releases have no
-differences, the candidate release will be deleted.
+The script will check the diff of the current build and the just produced candidate build. If both builds have no
+differences, the candidate build will be deleted.
 
 At different build phases, user-defined scripts may be executed. These scripts may do some additional tasks like
-deleting unnecessary files from the release folder or copying env files from the current release. They may be executed
+deleting unnecessary files from the build folder or copying env files from the current build. They may be executed
 before and/or after the final diff operation.
 
-When the release is built, deploy may help with observing the file differences between the current release and the
+When the build is constructed, deploy may help with observing the file differences between the current build and the
 candidate one.
 
-It also provides commands to switch to the new candidate release or rollback to the previous one.
+It also provides commands to release the new candidate build or rollback to one of the previous ones.
 
-May delete old releases keeping a number of the most recent releases.
+May delete old builds keeping a number of the most recent builds.
 
 ## Installation
 
@@ -83,14 +83,14 @@ archive.
 
 Then the following operations are available to you:
 
-- build a new release from a git project `/opt/site-net` (creates a new folder `/var/www/site.net-TIMESTAMP` without
+- prepare a new build from a git project `/opt/site-net` (creates a new folder `/var/www/site.net-TIMESTAMP` without
   moving the current symlink):
 
    ```shell
    sudo deploy build site.net /opt/site-net
    ```
 
-- build a new release from a git project `/opt/example-com` (it's `www/` sub-folder), copying additional dark theme of
+- prepare a new build from a git project `/opt/example-com` (it's `www/` sub-folder), copying additional dark theme of
   zip archive `/opt/example-com-darktheme.zip` stored in `build/` folder inside it (creates a new
   folder `/var/www/example.com-TIMESTAMP` without moving the current symlink):
 
@@ -98,64 +98,64 @@ Then the following operations are available to you:
    sudo deploy build example.com /opt/example-com/www /opt/example-com-darktheme.zip:build
    ```
 
-- change a release folder owner to non-default value after build (set an owner to `john` instead of `www-data`):
+- change a build folder owner to non-default value (set an owner to `john` instead of `www-data`):
 
    ```shell
    OWNER=john sudo -E deploy build site.net
    ```
 
-- build release in non-default web folder (if web folders are organized in `/usr/local/nginx` instead of `/var/www`):
+- prepare build in non-default web folder (if web folders are organized in `/usr/local/nginx` instead of `/var/www`):
 
    ```shell
    BASE_WWW=/usr/local/nginx sudo -E deploy build site.net
    ```
 
-- run an after build script passing current and new release folders as arguments; an after-build script is executed
-  after the build but before the diff phase (that identifies whether the new candidate release contains updated files
-  over the current release):
+- run an after-build script passing current and new build folders as arguments; an after-build script is executed
+  after the build but before the diff phase (that identifies whether the new candidate build contains updated files
+  over the current build):
 
    ```shell
    SCRIPT_AFTER_BUILD=./after-build.sh sudo -E deploy build site.net
    ```
 
-- run an after diff script passing current and new release folders as arguments; an after-diff script is executed after
-  the diff phase (that identifies whether the new candidate release contains updated files over the current release) and
+- run an after-diff script passing current and new build folders as arguments; an after-diff script is executed after
+  the diff phase (that identifies whether the new candidate build contains updated files over the current build) and
   only if the diff is non-empty:
 
    ```shell
    SCRIPT_AFTER_DIFF=./after-diff.sh sudo -E deploy build site.net
    ```
 
-- compare current release and the new one for `example.com` symlink (without moving the current symlink):
+- compare current build and the new one for `example.com` symlink (without moving the current symlink):
 
    ```shell
    deploy diff example.com
    ```
 
-- deploy the new candidate release for `example.com` symlink (will point the symlink to the most recent release
+- release the new candidate build for `example.com` symlink (will point the symlink to the most recent build
   in `/var/www/example.com-TIMESTAMP`):
 
    ```shell
-   sudo deploy commit example.com
+   sudo deploy release example.com
    ```
 
-- rollback the `example.com` symlink (will point the symlink to the release in `/var/www` that precedes the current
+- rollback the `example.com` symlink (will point the symlink to the build in `/var/www` that precedes the current
   one):
 
    ```shell
    sudo deploy rollback example.com
    ```
 
-### Sample workflow with explanation of `commit` and `rollback` modes
+### Sample workflow with explanation of `release` and `rollback` modes
 
 Starting with the file structure given in [Description](#description), with `example.com` symlink pointing
 to `example.com-231012-151633` folder.
 
 - first `sudo deploy rollback example.com` command will change symlink to point to `example.com-231012-150241` (previous
-  release)
+  build)
 
 - next `sudo deploy rollback example.com` command will change symlink to point to `example.com-231012-135855`
-  (before-previous release)
+  (before-previous build)
 
 - final `sudo deploy commit example.com` command will change symlink to point back to `example.com-231012-151633` (the
-  most recent release)
+  most recent build)
