@@ -92,16 +92,22 @@ case "$MODE" in
         continue
       }
 
-      echo merge contents from $BUILD_FILE:/$BUILD_SUBFOLDER into build folder $BUILD_FOLDER...
-      unzip -q "$BUILD_FILE" -d "/tmp/$NEXT_NAME"
-      [ -d "/tmp/$NEXT_NAME/$BUILD_SUBFOLDER" ] || {
-        echo "Correct build subfolder is required, '$BUILD_SUBFOLDER' does not exist in '$BUILD_FILE'" >>/dev/stderr
+      if [ -d "$BUILD_FILE" ]
+      then
+        echo merge contents from folder $BUILD_FILE/ into build folder $BUILD_FOLDER/...
+        rsync -aC "$BUILD_FILE/" "$BUILD_FOLDER/"
+      else
+        echo merge contents from $BUILD_FILE:/$BUILD_SUBFOLDER into build folder $BUILD_FOLDER...
+        unzip -q "$BUILD_FILE" -d "/tmp/$NEXT_NAME"
+        [ -d "/tmp/$NEXT_NAME/$BUILD_SUBFOLDER" ] || {
+          echo "Correct build subfolder is required, '$BUILD_SUBFOLDER' does not exist in '$BUILD_FILE'" >>/dev/stderr
+          rm -rf "/tmp/$NEXT_NAME"
+          rm -rf "$1"
+          continue
+        }
+        rsync -aC "/tmp/$NEXT_NAME/$BUILD_SUBFOLDER/" "$BUILD_FOLDER/"
         rm -rf "/tmp/$NEXT_NAME"
-        rm -rf "$1"
-        continue
-      }
-      rsync -aC "/tmp/$NEXT_NAME/$BUILD_SUBFOLDER/" "$BUILD_FOLDER/"
-      rm -rf "/tmp/$NEXT_NAME"
+      fi
     done
 
     # set build folder owner
