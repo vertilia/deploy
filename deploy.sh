@@ -214,7 +214,7 @@ case "$MODE" in
 
   (rollback)
     CURR_NAME=$(readlink "$BASE_WWW/$LINK")
-    PREV_NAME=$(cd "$BASE_WWW"; link_dirs "$LINK" |awk -v "CURR=$CURR_NAME" '$0==CURR {exit} {prev=$0} END {print prev}')
+    PREV_NAME=$(basename "$(link_dirs "$BASE_WWW/$LINK" |awk -v "CURR=$BASE_WWW/$CURR_NAME" '$0==CURR {exit} {prev=$0} END {print prev}')")
 
     [ -z "$PREV_NAME" ] && {
       echo "Cannot rollback: '$CURR_NAME' is the earliest available build" >>/dev/stderr
@@ -233,7 +233,10 @@ case "$MODE" in
   (clean)
     N_KEEP=${3:-5}
     echo remove all but the last $N_KEEP $LINK builds...
-    link_dirs "$BASE_WWW/$LINK" |head -n -"$N_KEEP" |xargs sudo rm -rf
+    T_FILE=$(mktemp)
+    link_dirs "$BASE_WWW/$LINK" |head -n -"$N_KEEP" |tee "$T_FILE" |xargs sudo rm -rf
+    cat "$T_FILE"
+    rm "$T_FILE"
     ;;
 
   (current)
