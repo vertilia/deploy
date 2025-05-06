@@ -241,8 +241,7 @@ case "$MODE" in
     ;;
 
   (list)
-    cd "$BASE_WWW"
-    ls -dalF *
+    find "$BASE_WWW/" -maxdepth 1 -type l -exec sh -c 'echo "{}"; ls -1drc "{}"-*' ';' |xargs ls -Ffld
     ;;
 
   (self-update)
