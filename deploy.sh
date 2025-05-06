@@ -34,6 +34,18 @@ link:               symbolic link name in base www folder (specified in
 EOT
 }
 
+# outputs all directories for the link, in created order
+# $1 = link name with base dir, ex: /var/www/site.net
+link_dirs () {
+    ls -1drc "$1-"* |grep "$1-[^-]\+-[^-]\+\$"
+}
+
+# outputs the last created directory for the link, ex: site.net-250101-000000
+# $1 = link name with base dir, ex: /var/www/site.net
+last_link_dir () {
+    echo $(basename "$(link_dirs "$1" |tail -1)")
+}
+
 BASE_WWW=${BASE_WWW:-/var/www}
 OWNER=${OWNER:-www-data}
 MODE=$1
@@ -144,7 +156,7 @@ case "$MODE" in
 
   (diff)
     CURR_NAME=$(readlink "$BASE_WWW/$LINK")
-    NEXT_NAME=$(basename "$(ls -1d "$BASE_WWW/$LINK-"[0-9]* |tail -1)")
+    NEXT_NAME=$(last_link_dir "$BASE_WWW/$LINK")
     BUILD_FOLDER=$BASE_WWW/$NEXT_NAME
 
     [ "$CURR_NAME" = "$NEXT_NAME" ] && {
@@ -159,7 +171,7 @@ case "$MODE" in
 
   (diff-list)
     CURR_NAME=$(readlink "$BASE_WWW/$LINK")
-    NEXT_NAME=$(basename "$(ls -1d "$BASE_WWW/$LINK-"[0-9]* |tail -1)")
+    NEXT_NAME=$(last_link_dir "$BASE_WWW/$LINK")
     BUILD_FOLDER=$BASE_WWW/$NEXT_NAME
 
     [ "$CURR_NAME" = "$NEXT_NAME" ] && {
@@ -174,7 +186,7 @@ case "$MODE" in
 
   (drop-last)
     CURR_NAME=$(readlink "$BASE_WWW/$LINK")
-    NEXT_NAME=$(basename "$(ls -1d "$BASE_WWW/$LINK-"[0-9]* |tail -1)")
+    NEXT_NAME=$(last_link_dir "$BASE_WWW/$LINK")
 
     [ "$CURR_NAME" = "$NEXT_NAME" ] && {
       echo "Current link $LINK points to the most recent build, rollback first" >>/dev/stderr
@@ -187,7 +199,7 @@ case "$MODE" in
 
   (release|commit)
     CURR_NAME=$(readlink "$BASE_WWW/$LINK")
-    NEXT_NAME=$(basename "$(ls -1d "$BASE_WWW/$LINK-"[0-9]* |tail -1)")
+    NEXT_NAME=$(last_link_dir "$BASE_WWW/$LINK")
 
     [ "$CURR_NAME" = "$NEXT_NAME" ] && {
       echo "Current link $LINK already points to the most recent build" >>/dev/stderr
@@ -202,7 +214,7 @@ case "$MODE" in
 
   (rollback)
     CURR_NAME=$(readlink "$BASE_WWW/$LINK")
-    PREV_NAME=$(cd "$BASE_WWW"; ls -1d "$LINK-"[0-9]* |awk -v "CURR=$CURR_NAME" '$0==CURR {exit} {prev=$0} END {print prev}')
+    PREV_NAME=$(cd "$BASE_WWW"; link_dirs "$LINK" |awk -v "CURR=$CURR_NAME" '$0==CURR {exit} {prev=$0} END {print prev}')
 
     [ -z "$PREV_NAME" ] && {
       echo "Cannot rollback: '$CURR_NAME' is the earliest available build" >>/dev/stderr
@@ -221,7 +233,7 @@ case "$MODE" in
   (clean)
     N_KEEP=${3:-5}
     echo remove all but the last $N_KEEP $LINK builds...
-    ls -1d "$BASE_WWW/$LINK-"[0-9]* |head -n -"$N_KEEP" |xargs sudo rm -rf
+    link_dirs "$BASE_WWW/$LINK" |head -n -"$N_KEEP" |xargs sudo rm -rf
     ;;
 
   (current)
