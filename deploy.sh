@@ -37,7 +37,7 @@ EOT
 # outputs all directories for the link, in created order
 # $1 = link name with base dir, ex: /var/www/site.net
 link_dirs () {
-    ls -1drc "$1-"* |grep "$1-[^-]\+-[^-]\+\$"
+    ls -1d "$1-"* |grep "$1-[^-]\+-[^-]\+\$"
 }
 
 # outputs the last created directory for the link, ex: site.net-250101-000000
@@ -244,7 +244,7 @@ case "$MODE" in
     ;;
 
   (list)
-    find "$BASE_WWW/" -maxdepth 1 -type l -exec sh -c 'echo "{}"; ls -1drc "{}"-*' ';' |xargs ls -Ffld
+    find "$BASE_WWW/" -maxdepth 1 -type l -exec sh -c 'echo "{}"; ls -1d "{}"-*' ';' |xargs ls -Ffld
     ;;
 
   (self-update)
